@@ -1,0 +1,4 @@
+*.pyc
+pretrained_models/*
+venv-psp/*
+*.dat

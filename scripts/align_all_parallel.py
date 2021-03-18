@@ -24,9 +24,14 @@ import scipy.ndimage
 import dlib
 import multiprocessing as mp
 import math
+import sys
+sys.path.append(".")
+sys.path.append("..")
 
 from configs.paths_config import model_paths
 SHAPE_PREDICTOR_PATH = model_paths["shape_predictor"]
+
+IMAGE_RESOLUTION = 512
 
 
 def get_landmark(filepath, predictor):
@@ -54,6 +59,8 @@ def align_face(filepath, predictor):
 	:param filepath: str
 	:return: PIL Image
 	"""
+
+	global IMAGE_RESOLUTION
 
 	lm = get_landmark(filepath, predictor)
 
@@ -89,8 +96,8 @@ def align_face(filepath, predictor):
 	# read image
 	img = PIL.Image.open(filepath)
 
-	output_size = 256
-	transform_size = 256
+	output_size = IMAGE_RESOLUTION
+	transform_size = IMAGE_RESOLUTION
 	enable_padding = True
 
 	# Shrink.
@@ -168,11 +175,14 @@ def parse_args():
 	parser = ArgumentParser(add_help=False)
 	parser.add_argument('--num_threads', type=int, default=1)
 	parser.add_argument('--root_path', type=str, default='')
+	parser.add_argument('--size', type=int, default=1024, help="output image resolution")
 	args = parser.parse_args()
 	return args
 
 
 def run(args):
+	global IMAGE_RESOLUTION
+	IMAGE_RESOLUTION = args.size
 	root_path = args.root_path
 	out_crops_path = root_path + '_crops'
 	if not os.path.exists(out_crops_path):
@@ -183,7 +193,7 @@ def run(args):
 		for file in files:
 			file_path = os.path.join(root, file)
 			fname = os.path.join(out_crops_path, os.path.relpath(file_path, root_path))
-			res_path = '{}.jpg'.format(os.path.splitext(fname)[0])
+			res_path = '{}.png'.format(os.path.splitext(fname)[0])
 			if os.path.splitext(file_path)[1] == '.txt' or os.path.exists(res_path):
 				continue
 			file_paths.append((file_path, res_path))

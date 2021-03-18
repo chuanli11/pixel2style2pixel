@@ -1,0 +1,12 @@
+torch==1.6.0
+torchvision
+scipy
+matplotlib
+tqdm
+numpy
+opencv-python
+pillow
+tensorboard
+ninja
+imageio
+dlib
